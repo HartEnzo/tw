@@ -1,4 +1,4 @@
-import Post from '../models/Post.js';
+import Post from '../models/post-model.js';
 
 export const createPost = async (req, res) => {
     const post = new Post({ text: req.body.text, user: req.user.id });
