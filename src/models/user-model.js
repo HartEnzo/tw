@@ -1,18 +1,50 @@
-import mongoose from "mongoose";
-import brcypt from "bcrypt";
+import { Schema, model } from "mongoose";
+import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema({
-    nickname: { type: String, default: ""},
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    });
+const userSchema = new Schema(
+  {
+    email: {
+      type: Schema.Types.String,
+      required: true,
+      unique: true,
+      validate: {
+        validator(v) {
+          return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(v);
+        },
+      },
+    },
+    password: {
+      type: Schema.Types.String,
+      required: true,
+      validate: {
+        validator(v) {
+          return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(v);
+        },
+      },
+    },
+    role: {
+      type: Schema.Types.String,
+      enum: ["USER", "ADMINISTRATOR"],
+      default: "USER"
+    },
+    following: {
+      type: [Schema.Types.ObjectId],
+      ref: "User"
+    }
+  },
+  {
+    timestamps: true,
+  }
+);
 
-    userSchema.pre("save", async function (next) {
-        if (this.isModified("password")) {
-            this.password = await brcypt.hash(this.password, 10);
-        }
-        next();
-    });
+userSchema.pre("save", async function () {
+  this.password = await bcrypt.hash(this.password, 10);
+});
 
-    export default mongoose.model('User', userSchema);
-    
+userSchema.methods.isValidPassword = async function(password) {
+    return await bcrypt.compare(password, this.password)
+}
+
+const User = model("User", userSchema);
+
+export default User;

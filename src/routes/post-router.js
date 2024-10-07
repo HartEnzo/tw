@@ -1,12 +1,23 @@
-import express from 'express';
-import { createPost, getPosts, updatePost, deletePost } from '../controllers/post-conroller.js';
-import { authenticateJWT } from '../middlewares/jwt-Authenticate.js';
+import { Router } from "express";
+import authenticator from "../middlewares/authenticator.js";
+import {
+  destroy,
+  index,
+  show,
+  store,
+  update,
+} from "../controllers/post-controller.js";
+const router = Router();
 
-const router = express.Router();
+// Rotas públicas
 
-router.post('/', authenticateJWT, createPost);
-router.get('/', authenticateJWT, getPosts);
-router.put('/:id', authenticateJWT, updatePost);
-router.delete('/:id', authenticateJWT, deletePost);
+router.use(authenticator);
+
+// Rotas privadas
+router.get("/", index);
+router.get("/:id", show);
+router.post("/", store);
+router.put("/:id", update);
+router.delete("/:id", destroy);
 
 export default router;
