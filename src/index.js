@@ -1,8 +1,8 @@
 import e from "express";
 import "dotenv/config.js";
 import "./config/db.js";
-import user_router from "./routes/user-route.js";
-import post_router from "./routes/post-route.js"
+import user_router from "./routes/user-router.js";
+import post_router from "./routes/post-router.js"
 
 const app = e();
 
